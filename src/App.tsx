@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PreferencesForm } from './components/PreferencesForm';
 import { getMovieRecommendations } from './services/api';
