@@ -13,7 +13,7 @@ const validateMovieRecommendation = (movie: any): MovieRecommendation => {
     genre: 'string',
     mood: 'string',
     language: 'string',
-    duration: 'string',
+    duration: 'number',
     platform: 'string',
     cast: 'array',
     crew: 'object',
@@ -35,6 +35,13 @@ const validateMovieRecommendation = (movie: any): MovieRecommendation => {
     if (type === 'string' && typeof movie[field] !== 'string') {
       throw new Error(`Invalid format for field: ${field} - must be a string`);
     }
+    if (type === 'number' && (typeof movie[field] !== 'number' || isNaN(movie[field]))) {
+      throw new Error(`Invalid format for field: ${field} - must be a number`);
+    }
+  }
+
+  if (movie.duration <= 0) {
+    throw new Error('Duration must be a positive number');
   }
 
   if (!Array.isArray(movie.cast)) {
@@ -66,23 +73,8 @@ const validateMovieRecommendation = (movie: any): MovieRecommendation => {
   }
 
   return {
-    movie_name: movie.movie_name,
-    genre: movie.genre,
-    mood: movie.mood,
-    language: movie.language,
-    duration: movie.duration,
-    platform: movie.platform,
-    cast: movie.cast,
-    crew: {
-      director: movie.crew.director,
-      writers: movie.crew.writers
-    },
-    ratings: {
-      imdb: movie.ratings.imdb,
-      rottenTomatoes: movie.ratings.rottenTomatoes
-    },
-    synopsis: movie.synopsis,
-    trailer_link: movie.trailer_link
+    ...movie,
+    duration: Number(movie.duration)
   };
 };
 
@@ -98,7 +90,7 @@ export const getMovieRecommendations = async (
         messages: [
           {
             role: 'system',
-            content: `You are a movie recommendation assistant. Given mood, genre, language, duration, and streaming platforms, recommend exactly 3 movies. Each movie must be a JSON object with these exact fields: movie_name (string), genre (string), mood (string), language (string), duration (string), platform (string), cast (array of strings), crew (object with director string and writers array), ratings (object with imdb string and rottenTomatoes string), synopsis (string), and trailer_link (string). Respond with a JSON object containing a "movies" array with exactly 3 movie objects.`
+            content: `You are a movie recommendation assistant. Given mood, genre, language, duration, and streaming platforms, recommend exactly 3 movies. Each movie must be a JSON object with these exact fields: movie_name (string), genre (string), mood (string), language (string), duration (number - exact minutes), platform (string), cast (array of strings), crew (object with director string and writers array), ratings (object with imdb string and rottenTomatoes string), synopsis (string), and trailer_link (string). Respond with a JSON object containing a "movies" array with exactly 3 movie objects.`
           },
           {
             role: 'user',

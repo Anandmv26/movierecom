@@ -8,12 +8,22 @@ export type Duration = 'Short' | 'Medium' | 'Long';
 
 export type Platform = 'Netflix' | 'Amazon Prime' | 'Hotstar' | 'Other Indian platforms' | 'Anything';
 
+// Duration preference for user input
+export type DurationPreference = 'Short' | 'Medium' | 'Long';
+
+// Duration display mapping for user interface
+export const DURATION_RANGES: Record<DurationPreference, { min: number; max: number }> = {
+  'Short': { min: 0, max: 90 },
+  'Medium': { min: 90, max: 120 },
+  'Long': { min: 120, max: Infinity }
+};
+
 export interface MovieRecommendation {
   movie_name: string;
   genre: string;
   mood: string;
   language: string;
-  duration: string;
+  duration: number;  // Changed to number for exact minutes
   platform: string;
   cast: string[];
   crew: {
@@ -32,7 +42,7 @@ export interface UserPreferences {
   mood: Mood;
   genres: Genre[];
   languages: Language[];
-  duration: Duration;
+  duration: DurationPreference;
   platforms: Platform[];
 }
 
