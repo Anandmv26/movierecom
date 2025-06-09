@@ -8,6 +8,8 @@ export type Duration = 'Short' | 'Medium' | 'Long';
 
 export type Platform = 'Netflix' | 'Amazon Prime' | 'Hotstar' | 'Other Indian platforms' | 'Anything';
 
+export type ContentType = 'Movie' | 'Series' | 'Both';
+
 // Duration preference for user input
 export type DurationPreference = 'Short' | 'Medium' | 'Long';
 
@@ -44,6 +46,7 @@ export interface UserPreferences {
   languages: Language[];
   duration: DurationPreference;
   platforms: Platform[];
+  contentTypes: ContentType[];
 }
 
 export interface MovieCardProps {

@@ -49,15 +49,14 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-cinematic-bg text-cinematic-text">
-
+    <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-purple-950 to-blue-950 text-white">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 bg-cinematic-bg z-10 py-4 shadow-md">
+      <header className="fixed top-0 left-0 right-0 bg-gradient-to-r from-indigo-900/90 via-purple-900/90 to-blue-900/90 backdrop-blur-sm z-10 py-4 shadow-lg">
         <div className="container mx-auto px-4">
           <motion.h1
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-2xl font-bold text-center"
+            className="text-3xl font-bold text-center text-white"
           >
             Cinefy 🎬
           </motion.h1>
@@ -65,126 +64,105 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 pt-[75px]"> {/* Padding to accommodate fixed header */}
+      <div className="container mx-auto px-4 pt-[90px]">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
           {/* Preferences Form - 4 columns (40%) */}
           <div className="lg:col-span-4">
-            <div className="sticky top-4"> {/* Removed fixed height */}
+            <div className="lg:sticky lg:top-4">
               <PreferencesForm onSubmit={handleSubmit} isLoading={isLoading} />
             </div>
           </div>
 
           {/* Movie Cards - 6 columns (60%) */}
-          <div className="lg:col-span-6">
+          <div className="lg:col-span-6 space-y-3 lg:max-h-[calc(108vh-150px)] lg:overflow-y-auto pr-2 pb-4
+            [&::-webkit-scrollbar]:w-2
+            [&::-webkit-scrollbar-track]:bg-transparent
+            [&::-webkit-scrollbar-thumb]:bg-gradient-to-b [&::-webkit-scrollbar-thumb]:from-purple-500 [&::-webkit-scrollbar-thumb]:to-indigo-500
+            [&::-webkit-scrollbar-thumb]:rounded-full
+            [&::-webkit-scrollbar-thumb:hover]:from-purple-600 [&::-webkit-scrollbar-thumb:hover]:to-indigo-600
+            [scrollbar-width:thin]
+            [scrollbar-color:theme(colors.purple.500)_transparent]">
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-4 rounded-lg bg-red-500/20 border border-red-500/50 text-red-200"
+              >
+                {error}
+              </motion.div>
+            )}
+
             <AnimatePresence mode="wait">
-              {error && (
+              {movies.map((movie, index) => (
                 <motion.div
+                  key={movie.movie_name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}
-                  className="bg-red-500 bg-opacity-10 border border-red-500 text-red-500 p-3 rounded-lg mb-4 text-sm"
+                  transition={{ delay: index * 0.1 }}
+                  className="bg-gradient-to-br from-indigo-900/50 via-purple-900/50 to-blue-900/50 backdrop-blur-sm rounded-xl p-6 shadow-xl border border-white/10"
                 >
-                  {error}
-                </motion.div>
-              )}
+                  <div className="flex flex-col space-y-4">
+                    <div className="flex justify-between items-start">
+                      <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 text-transparent bg-clip-text">
+                        {movie.movie_name}
+                      </h2>
+                      <div className="flex items-center space-x-2">
+                        <span className="flex items-center text-yellow-400">
+                          <StarIcon className="w-5 h-5 mr-1" />
+                          {movie.ratings.imdb}
+                        </span>
+                        <span className="flex items-center text-red-400">
+                          <FilmIcon className="w-5 h-5 mr-1" />
+                          {movie.ratings.rottenTomatoes}
+                        </span>
+                      </div>
+                    </div>
 
-              {isLoading ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="flex items-center justify-center h-32"
-                >
-                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cinematic-accent"></div>
-                </motion.div>
-              ) : movies.length > 0 ? (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="grid gap-6"
-                >
-                  {movies.map((movie) => (
-                    <motion.div
-                      key={movie.movie_name}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="bg-cinematic-card rounded-xl p-6"
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm">
+                        {movie.genre}
+                      </span>
+                      <span className="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-sm">
+                        {movie.language}
+                      </span>
+                      <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-sm">
+                        {movie.platform}
+                      </span>
+                      <span className="px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 text-sm flex items-center">
+                        <ClockIcon className="w-4 h-4 mr-1" />
+                        {movie.duration} min
+                      </span>
+                    </div>
+
+                    <p className="text-gray-300">{movie.synopsis}</p>
+
+                    <div className="space-y-2">
+                      <div>
+                        <span className="text-indigo-300">Director: </span>
+                        <span className="text-white">{movie.crew.director}</span>
+                      </div>
+                      <div>
+                        <span className="text-indigo-300">Writers: </span>
+                        <span className="text-white">{movie.crew.writers.join(', ')}</span>
+                      </div>
+                      <div>
+                        <span className="text-indigo-300">Cast: </span>
+                        <span className="text-white">{movie.cast.join(', ')}</span>
+                      </div>
+                    </div>
+
+                    <a
+                      href={movie.trailer_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-medium hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
                     >
-                      <div className="flex justify-between items-start mb-4">
-                        <h2 className="text-2xl font-bold">{movie.movie_name}</h2>
-                        <div className="flex items-center gap-4">
-                          <div className="flex items-center gap-1 text-yellow-500">
-                            <StarIcon className="w-5 h-5" />
-                            <span className="text-sm font-medium">IMDb: {movie.ratings.imdb}</span>
-                          </div>
-                          <div className="flex items-center gap-1 text-red-500">
-                            <span className="text-sm font-medium">RT: {movie.ratings.rottenTomatoes}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-6 mb-4">
-                        <div>
-                          <h3 className="text-sm font-medium text-cinematic-text-secondary mb-2">Crew</h3>
-                          <div className="space-y-1.5">
-                            <p className="text-sm">
-                              <span className="font-medium">Director:</span> {movie.crew.director}
-                            </p>
-                            <p className="text-sm">
-                              <span className="font-medium">Writers:</span> {movie.crew.writers.join(', ')}
-                            </p>
-                          </div>
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-medium text-cinematic-text-secondary mb-2">Details</h3>
-                          <div className="space-y-1.5">
-                            <div className="flex items-center gap-2">
-                              <span className="chip text-xs py-0.5">{movie.genre}</span>
-                              <span className="chip text-xs py-0.5">{movie.language}</span>
-                            </div>
-                            <div className="flex items-center gap-4 text-sm">
-                              <div className="flex items-center gap-1">
-                                <ClockIcon className="w-4 h-4 text-cinematic-text-secondary" />
-                                <span>{movie.duration} min</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <FilmIcon className="w-4 h-4 text-cinematic-text-secondary" />
-                                <span>{movie.platform}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mb-4">
-                        <h3 className="text-sm font-medium text-cinematic-text-secondary mb-2">Cast</h3>
-                        <p className="text-sm">{movie.cast.join(', ')}</p>
-                      </div>
-
-                      <div className="mb-6">
-                        <h3 className="text-sm font-medium text-cinematic-text-secondary mb-2">Synopsis</h3>
-                        <p className="text-sm text-cinematic-text-secondary">{movie.synopsis}</p>
-                      </div>
-
-                      <a
-                        href={movie.trailer_link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-primary inline-block text-sm py-2 px-6"
-                      >
-                        Watch Trailer
-                      </a>
-                    </motion.div>
-                  ))}
+                      Watch Trailer
+                    </a>
+                  </div>
                 </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="text-center text-cinematic-text-secondary py-8 text-sm"
-                >
-                  Select your preferences to get movie recommendations
-                </motion.div>
-              )}
+              ))}
             </AnimatePresence>
           </div>
         </div>

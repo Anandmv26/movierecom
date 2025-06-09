@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { UserPreferences, Mood, Genre, Language, DurationPreference, Platform, DURATION_RANGES } from '../types';
+import { UserPreferences, Mood, Genre, Language, DurationPreference, Platform, ContentType, DURATION_RANGES } from '../types';
 
 interface PreferencesFormProps {
   onSubmit: (preferences: UserPreferences) => void;
@@ -27,13 +27,16 @@ const DURATION_DISPLAY: Record<DurationPreference, string> = {
 
 const PLATFORMS: Platform[] = ['Netflix', 'Amazon Prime', 'Hotstar', 'Other Indian platforms', 'Anything'];
 
+const CONTENT_TYPES: ContentType[] = ['Movie', 'Series', 'Both'];
+
 export const PreferencesForm = ({ onSubmit, isLoading }: PreferencesFormProps) => {
   const [preferences, setPreferences] = useState<UserPreferences>({
-    mood: 'Happy',
+    mood: '' as Mood,
     genres: [],
     languages: [],
     duration: '' as DurationPreference,
-    platforms: []
+    platforms: [],
+    contentTypes: []
   });
 
   const toggleArrayItem = <T extends string>(array: T[], item: T): T[] => {
@@ -51,107 +54,173 @@ export const PreferencesForm = ({ onSubmit, isLoading }: PreferencesFormProps) =
     <motion.form
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="space-y-3 p-4 bg-cinematic-card rounded-xl h-full flex flex-col"
+      className="flex flex-col lg:h-[calc(100vh-6rem)] h-auto bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 rounded-xl shadow-xl backdrop-blur-sm bg-opacity-90 text-white overflow-hidden"
       onSubmit={handleSubmit}
     >
-      <div className="space-y-3 flex-1">
-        <div>
-          <label className="block text-sm font-medium mb-1">How are you feeling?</label>
-          <div className="grid grid-cols-3 gap-1.5">
-            {MOODS.map(moodOption => (
-              <button
-                key={moodOption.value}
-                type="button"
-                className={`chip text-sm py-1 ${preferences.mood === moodOption.value ? 'chip-selected' : ''}`}
-                onClick={() => setPreferences({ ...preferences, mood: moodOption.value })}
-              >
-                {moodOption.value} {moodOption.emoji}
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* Scrollable content area with themed scrollbar - only on lg screens */}
+      <div className="flex-1 lg:overflow-y-auto overflow-visible px-6 py-6 space-y-4
+        [&::-webkit-scrollbar]:w-2
+        [&::-webkit-scrollbar-track]:bg-transparent
+        [&::-webkit-scrollbar-thumb]:bg-gradient-to-b [&::-webkit-scrollbar-thumb]:from-purple-500 [&::-webkit-scrollbar-thumb]:to-indigo-500
+        [&::-webkit-scrollbar-thumb]:rounded-full
+        [&::-webkit-scrollbar-thumb:hover]:from-purple-600 [&::-webkit-scrollbar-thumb:hover]:to-indigo-600
+        [scrollbar-width:thin]
+        [scrollbar-color:theme(colors.purple.500)_transparent]">
+        {/* Center content vertically when there's extra space - only on lg screens */}
+        <div className="lg:min-h-full lg:flex lg:flex-col lg:justify-center">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium mb-2 text-indigo-200">Content Type</label>
+              <div className="grid grid-cols-3 gap-2">
+                {CONTENT_TYPES.map(type => (
+                  <button
+                    key={type}
+                    type="button"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                      ${preferences.contentTypes.includes(type) 
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg transform scale-105' 
+                        : 'bg-white/10 hover:bg-white/20 text-indigo-100'}`}
+                    onClick={() => setPreferences({
+                      ...preferences,
+                      contentTypes: toggleArrayItem(preferences.contentTypes, type)
+                    })}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Genres</label>
-          <div className="grid grid-cols-3 gap-1.5">
-            {GENRES.map(genre => (
-              <button
-                key={genre}
-                type="button"
-                className={`chip text-sm py-1 ${preferences.genres.includes(genre) ? 'chip-selected' : ''}`}
-                onClick={() => setPreferences({
-                  ...preferences,
-                  genres: toggleArrayItem(preferences.genres, genre)
-                })}
-              >
-                {genre}
-              </button>
-            ))}
-          </div>
-        </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-indigo-200">How are you feeling?</label>
+              <div className="grid grid-cols-3 gap-2">
+                {MOODS.map(moodOption => (
+                  <button
+                    key={moodOption.value}
+                    type="button"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                      ${preferences.mood === moodOption.value 
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg transform scale-105' 
+                        : 'bg-white/10 hover:bg-white/20 text-indigo-100'}`}
+                    onClick={() => setPreferences({ ...preferences, mood: moodOption.value })}
+                  >
+                    {moodOption.value} {moodOption.emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Languages</label>
-          <div className="grid grid-cols-3 gap-1.5">
-            {LANGUAGES.map(language => (
-              <button
-                key={language}
-                type="button"
-                className={`chip text-sm py-1 ${preferences.languages.includes(language) ? 'chip-selected' : ''}`}
-                onClick={() => setPreferences({
-                  ...preferences,
-                  languages: toggleArrayItem(preferences.languages, language)
-                })}
-              >
-                {language}
-              </button>
-            ))}
-          </div>
-        </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-indigo-200">Genres</label>
+              <div className="grid grid-cols-3 gap-2">
+                {GENRES.map(genre => (
+                  <button
+                    key={genre}
+                    type="button"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                      ${preferences.genres.includes(genre) 
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg transform scale-105' 
+                        : 'bg-white/10 hover:bg-white/20 text-indigo-100'}`}
+                    onClick={() => setPreferences({
+                      ...preferences,
+                      genres: toggleArrayItem(preferences.genres, genre)
+                    })}
+                  >
+                    {genre}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Duration</label>
-          <div className="grid grid-cols-3 gap-1.5">
-            {DURATIONS.map(duration => (
-              <button
-                key={duration}
-                type="button"
-                className={`chip text-sm py-1 ${preferences.duration === duration ? 'chip-selected' : ''}`}
-                onClick={() => setPreferences({ ...preferences, duration })}
-              >
-                {DURATION_DISPLAY[duration]}
-              </button>
-            ))}
-          </div>
-        </div>
+            <div>
+              <label className="block text-sm font-medium mb-2 text-indigo-200">Languages</label>
+              <div className="grid grid-cols-3 gap-2">
+                {LANGUAGES.map(language => (
+                  <button
+                    key={language}
+                    type="button"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                      ${preferences.languages.includes(language) 
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg transform scale-105' 
+                        : 'bg-white/10 hover:bg-white/20 text-indigo-100'}`}
+                    onClick={() => setPreferences({
+                      ...preferences,
+                      languages: toggleArrayItem(preferences.languages, language)
+                    })}
+                  >
+                    {language}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Streaming Platforms</label>
-          <div className="grid grid-cols-3 gap-1.5">
-            {PLATFORMS.map(platform => (
-              <button
-                key={platform}
-                type="button"
-                className={`chip text-sm py-1 ${preferences.platforms.includes(platform) ? 'chip-selected' : ''}`}
-                onClick={() => setPreferences({
-                  ...preferences,
-                  platforms: toggleArrayItem(preferences.platforms, platform)
-                })}
-              >
-                {platform}
-              </button>
-            ))}
+            <div>
+              <label className="block text-sm font-medium mb-2 text-indigo-200">Duration</label>
+              <div className="grid grid-cols-3 gap-2">
+                {DURATIONS.map(duration => (
+                  <button
+                    key={duration}
+                    type="button"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                      ${preferences.duration === duration 
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg transform scale-105' 
+                        : 'bg-white/10 hover:bg-white/20 text-indigo-100'}`}
+                    onClick={() => setPreferences({ ...preferences, duration })}
+                  >
+                    {DURATION_DISPLAY[duration]}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2 text-indigo-200">Streaming Platforms</label>
+              <div className="grid grid-cols-3 gap-2">
+                {PLATFORMS.map(platform => (
+                  <button
+                    key={platform}
+                    type="button"
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200
+                      ${preferences.platforms.includes(platform) 
+                        ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white shadow-lg transform scale-105' 
+                        : 'bg-white/10 hover:bg-white/20 text-indigo-100'}`}
+                    onClick={() => setPreferences({
+                      ...preferences,
+                      platforms: toggleArrayItem(preferences.platforms, platform)
+                    })}
+                  >
+                    {platform}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <button
-        type="submit"
-        className="btn-primary w-full py-2 text-base mt-3"
-        disabled={isLoading || preferences.genres.length === 0 || preferences.languages.length === 0 || preferences.platforms.length === 0 || !preferences.duration}
-      >
-        {isLoading ? 'Finding Movies...' : 'Get Movie Recommendations'}
-      </button>
+      {/* Submit button with gradient background that respects rounded corners */}
+      <div className="relative">
+        <div className="absolute inset-0 bg-gradient-to-t from-indigo-900/90 via-purple-900/90 to-transparent backdrop-blur-sm border-t border-white/10 rounded-b-xl"></div>
+        <div className="relative px-6 py-4">
+          <button
+            type="submit"
+            className="w-full py-3 px-4 rounded-lg text-base font-medium transition-all duration-200
+              bg-gradient-to-r from-purple-500 to-indigo-500 text-white
+              hover:from-purple-600 hover:to-indigo-600
+              disabled:opacity-50 disabled:cursor-not-allowed
+              shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+            disabled={isLoading || 
+              preferences.contentTypes.length === 0 ||
+              !preferences.mood || 
+              preferences.genres.length === 0 || 
+              preferences.languages.length === 0 || 
+              preferences.platforms.length === 0 || 
+              !preferences.duration}
+          >
+            {isLoading ? 'Finding Recommendations...' : 'Get Recommendations'}
+          </button>
+        </div>
+      </div>
     </motion.form>
   );
 }; 
