@@ -42,8 +42,10 @@ function App() {
       if (err instanceof Error && err.message.includes('Invalid API key')) {
         setApiKey('');
         localStorage.removeItem('openai_api_key');
+        setError('Invalid API key. Please check your OpenAI API key and try again.');
+      } else {
+        setError('Unable to get recommendations. Please try again.');
       }
-      setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsLoading(false);
     }
@@ -218,6 +220,14 @@ function App() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-medium hover:from-purple-600 hover:to-indigo-600 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+                      onClick={(e) => {
+                        // Handle YouTube URL redirection issues
+                        if (movie.trailer_link && movie.trailer_link.includes('youtube.com')) {
+                          e.preventDefault();
+                          // Open in new tab with proper YouTube URL
+                          window.open(movie.trailer_link, '_blank', 'noopener,noreferrer');
+                        }
+                      }}
                     >
                       <PlayIcon className="w-5 h-5 mr-2" />
                       Watch Trailer

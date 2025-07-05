@@ -102,7 +102,9 @@ export const getMovieRecommendations = async (
             - Match the selected language (English, Hindi, Tamil, Telugu, Malayalam)
             - Ensure variety (no duplicates or direct sequels)
             - For series, include number of seasons, episodes, and average episode length in the synopsis
-            - The \`trailer_link\` must be a valid **official YouTube trailer URL**
+            - The \`trailer_link\` must be a valid **official YouTube trailer URL** in this exact format: https://www.youtube.com/watch?v=VIDEO_ID
+            - Always use real, existing YouTube video IDs for trailers
+            - Use short, direct YouTube URLs (avoid youtu.be redirects)
             - The \`duration\` must be a string:
               - For movies → use total runtime (e.g., "120 mins")
               - For series → use format like "2 seasons, 16 episodes, ~40 mins each"
