@@ -1,31 +1,17 @@
-export type Mood = 'Happy' | 'Sad' | 'Relaxed' | 'Excited' | 'Thoughtful';
+export type Mood = 'Happy' | 'Sad' | 'Excited' | 'Calm' | 'Curious';
 
-export type Genre = 'Action' | 'Comedy' | 'Drama' | 'Sci-Fi' | 'Romance' | 'Open to any';
+export type Language = 'English' | 'Hindi' | 'Tamil' | 'Telugu' | 'Malayalam';
 
-export type Language = 'English' | 'Hindi' | 'Tamil' | 'Telugu' | 'Malayalam' | 'Open to any';
-
-export type Duration = 'Short' | 'Medium' | 'Long';
-
-export type Platform = 'Netflix' | 'Amazon Prime' | 'Hotstar' | 'Other Indian platforms' | 'Anything';
+export type Platform = 'Netflix' | 'Amazon Prime' | 'Hotstar' | 'Sony LIV' | 'Zee5' | 'Others';
 
 export type ContentType = 'Movie' | 'Series' | 'Both';
-
-// Duration preference for user input
-export type DurationPreference = 'Short' | 'Medium' | 'Long';
-
-// Duration display mapping for user interface
-export const DURATION_RANGES: Record<DurationPreference, { min: number; max: number }> = {
-  'Short': { min: 0, max: 90 },
-  'Medium': { min: 90, max: 120 },
-  'Long': { min: 120, max: Infinity }
-};
 
 export interface MovieRecommendation {
   movie_name: string;
   genre: string;
   mood: string;
   language: string;
-  duration: number;  // Changed to number for exact minutes
+  duration: string;  // String format like "120 mins" or "2 seasons, 16 episodes, ~40 mins each"
   platform: string;
   cast: string[];
   crew: {
@@ -42,9 +28,7 @@ export interface MovieRecommendation {
 
 export interface UserPreferences {
   mood: Mood;
-  genres: Genre[];
   languages: Language[];
-  duration: DurationPreference;
   platforms: Platform[];
   contentTypes: ContentType[];
 }

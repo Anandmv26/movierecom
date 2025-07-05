@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --title-font: 'Dancing Script', cursive;
+  }
+  
+  /* Automatically apply the loaded font to the title */
+  .app-title {
+    font-family: var(--title-font);
+  }
+  
   body {
     @apply bg-cinematic-bg text-cinematic-text min-h-screen;
   }

@@ -13,7 +13,7 @@ const validateMovieRecommendation = (movie: any): MovieRecommendation => {
     genre: 'string',
     mood: 'string',
     language: 'string',
-    duration: 'number',
+    duration: 'string',
     platform: 'string',
     cast: 'array',
     crew: 'object',
@@ -35,13 +35,10 @@ const validateMovieRecommendation = (movie: any): MovieRecommendation => {
     if (type === 'string' && typeof movie[field] !== 'string') {
       throw new Error(`Invalid format for field: ${field} - must be a string`);
     }
-    if (type === 'number' && (typeof movie[field] !== 'number' || isNaN(movie[field]))) {
-      throw new Error(`Invalid format for field: ${field} - must be a number`);
-    }
   }
 
-  if (movie.duration <= 0) {
-    throw new Error('Duration must be a positive number');
+  if (!movie.duration || typeof movie.duration !== 'string') {
+    throw new Error('Duration must be a non-empty string');
   }
 
   if (!Array.isArray(movie.cast)) {
@@ -74,7 +71,7 @@ const validateMovieRecommendation = (movie: any): MovieRecommendation => {
 
   return {
     ...movie,
-    duration: Number(movie.duration)
+    duration: movie.duration
   };
 };
 
@@ -90,29 +87,51 @@ export const getMovieRecommendations = async (
         messages: [
           {
             role: 'system',
-            content: `You are an expert movie and series recommendation assistant with deep knowledge of global cinema. Your task is to recommend exactly 3 movies/series based on user preferences. 
+            content: `You are a movie and series recommendation assistant. Based on the user's mood, content type (movie, series, or both), language, and streaming platforms, recommend exactly 3 titles.
 
-Key requirements:
-1. For "Sad" mood, recommend uplifting, feel-good content that can help improve the user's mood
-2. Verify that all recommended content is actually available on the specified streaming platforms
-3. Include diverse recommendations that match the user's preferences while introducing them to new content
-4. Respect the user's content type preferences (Movie, Series, or Both) - if they select specific types, only recommend those types
-5. For series recommendations, include the total number of seasons and episodes in the synopsis
-
-Each recommendation must be a JSON object with these exact fields:
-- movie_name (string): Full title of the movie/series
-- genre (string): Primary genre
-- mood (string): The emotional tone of the content
-- language (string): Original language
-- duration (number): Exact runtime in minutes (for movies) or average episode length (for series)
-- platform (string): Where it's available to stream
-- cast (array of strings): Main cast members
-- crew (object): {director: string, writers: string[]}
-- ratings (object): {imdb: string, rottenTomatoes: string}
-- synopsis (string): Brief but engaging description (for series, include number of seasons/episodes)
-- trailer_link (string): Official trailer URL
-
-Respond with a JSON object containing a "movies" array with exactly 3 movie/series objects.`
+            Follow this mood-to-content mapping:
+            - Sad → uplifting, feel-good stories
+            - Happy → light, joyful, entertaining content
+            - Excited → thrilling, action-packed, high-energy titles
+            - Calm → peaceful, relaxing, or meditative content
+            - Curious → thought-provoking, mysterious, or intellectual stories
+            
+            Requirements:
+            - Only include content available on the specified platforms (Netflix, Amazon Prime, Hotstar, Sony LIV, Zee5, Others)
+            - Match the selected content type (movie, series, or both)
+            - Match the selected language (English, Hindi, Tamil, Telugu, Malayalam)
+            - Ensure variety (no duplicates or direct sequels)
+            - For series, include number of seasons, episodes, and average episode length in the synopsis
+            - The \`trailer_link\` must be a valid **official YouTube trailer URL**
+            - The \`duration\` must be a string:
+              - For movies → use total runtime (e.g., "120 mins")
+              - For series → use format like "2 seasons, 16 episodes, ~40 mins each"
+            
+            Respond only with valid JSON in this format:
+            {
+              "movies": [
+                {
+                  "movie_name": "string",
+                  "genre": "string",
+                  "mood": "string",
+                  "language": "string",
+                  "duration": "string",  // e.g., "120 mins" or "2 seasons, 16 episodes, ~40 mins each"
+                  "platform": "string",
+                  "cast": ["string", "string"],
+                  "crew": {
+                    "director": "string",
+                    "writers": ["string", "string"]
+                  },
+                  "ratings": {
+                    "imdb": "string",
+                    "rottenTomatoes": "string"
+                  },
+                  "synopsis": "string",
+                  "trailer_link": "string"
+                },
+                // 2 more
+              ]
+            }`
           },
           {
             role: 'user',
