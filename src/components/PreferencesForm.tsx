@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { UserPreferences, Mood, Language, Platform, ContentType } from '../types';
+import { SparklesIcon } from '@heroicons/react/24/outline';
 
 interface PreferencesFormProps {
   onSubmit: (preferences: UserPreferences) => void;
@@ -204,14 +205,15 @@ export const PreferencesForm = ({ onSubmit, isLoading }: PreferencesFormProps) =
               bg-gradient-to-r from-purple-500 to-indigo-500 text-white
               hover:from-purple-600 hover:to-indigo-600
               disabled:opacity-50 disabled:cursor-not-allowed
-              shadow-lg hover:shadow-xl transform hover:scale-[1.02]"
+              shadow-lg hover:shadow-xl transform hover:scale-[1.02] flex items-center justify-center space-x-2"
             disabled={isLoading || 
               preferences.contentTypes.length === 0 ||
               !preferences.mood || 
               preferences.languages.length === 0 || 
               preferences.platforms.length === 0}
           >
-            {isLoading ? 'Finding Recommendations...' : 'Get Recommendations'}
+            <SparklesIcon className="w-5 h-5" />
+            <span>{isLoading ? 'Finding Recommendations...' : 'Get Recommendations'}</span>
           </button>
         </div>
       </div>

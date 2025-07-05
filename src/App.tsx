@@ -64,6 +64,47 @@ function App() {
         </div>
       </header>
 
+      {/* Full Screen Loader Overlay */}
+      {isLoading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm"
+        >
+          <div className="flex flex-col items-center space-y-8">
+            {/* Magical spinning film reel */}
+            <div className="relative">
+              <div className="w-24 h-24 border-4 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+              <div className="absolute inset-0 w-24 h-24 border-4 border-indigo-400 border-b-transparent rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }}></div>
+              <div className="absolute inset-2 w-20 h-20 border-4 border-pink-400 border-l-transparent rounded-full animate-spin" style={{ animationDuration: '2s' }}></div>
+            </div>
+            
+            {/* Movie camera icon */}
+            <div className="relative">
+              <FilmIcon className="w-16 h-16 text-purple-400 animate-pulse" />
+              <div className="absolute -top-2 -right-2 w-4 h-4 bg-yellow-400 rounded-full animate-ping"></div>
+            </div>
+            
+            {/* Loading text */}
+            <div className="text-center space-y-2">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-indigo-400 bg-clip-text text-transparent">
+                Finding Your Perfect Movies...
+              </h3>
+              <p className="text-indigo-300 text-lg">Crafting personalized recommendations just for you</p>
+            </div>
+            
+            {/* Floating sparkles */}
+            <div className="flex space-x-2">
+              <div className="w-2 h-2 bg-yellow-400 rounded-full animate-bounce" style={{ animationDelay: '0s' }}></div>
+              <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+              <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+              <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0.6s' }}></div>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Main Content */}
       <div className="container mx-auto px-4 pt-[70px]">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">
@@ -93,31 +134,17 @@ function App() {
               </motion.div>
             )}
 
-            {isLoading && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-8 rounded-lg bg-gradient-to-br from-indigo-900/50 via-purple-900/50 to-blue-900/50 backdrop-blur-sm border border-white/10 text-center"
-              >
-                <div className="flex flex-col items-center space-y-4">
-                  <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-purple-200 font-medium">Finding your perfect recommendations...</p>
-                  <p className="text-indigo-300 text-sm">This may take a few moments</p>
-                </div>
-              </motion.div>
-            )}
-
             <AnimatePresence mode="wait">
               {!isLoading && movies.length === 0 && !error && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-8 rounded-lg bg-gradient-to-br from-indigo-900/50 via-purple-900/50 to-blue-900/50 backdrop-blur-sm border border-white/10 text-center"
+                  className="lg:h-[calc(100vh-8rem)] flex items-center justify-center"
                 >
-                  <div className="flex flex-col items-center space-y-4">
-                    <FilmIcon className="w-12 h-12 text-purple-400" />
-                    <p className="text-purple-200 font-medium">Ready to discover amazing content?</p>
-                    <p className="text-indigo-300 text-sm">Fill out your preferences and get personalized recommendations</p>
+                  <div className="flex flex-col items-center justify-center space-y-4 text-center h-full">
+                    <FilmIcon className="w-16 h-16 text-purple-400" />
+                    <h3 className="text-2xl font-bold text-purple-200">Ready to discover amazing content?</h3>
+                    <p className="text-indigo-300 text-lg max-w-md">Fill out your preferences and get personalized movie recommendations tailored just for you</p>
                   </div>
                 </motion.div>
               )}
