@@ -35,7 +35,14 @@ function App() {
         localStorage.setItem('openai_api_key', newApiKey);
       }
       
-      const recommendations = await getMovieRecommendations(preferences, apiKey);
+      // Build an exclusion list from currently shown recommendations so
+      // subsequent requests don't return the same titles again.
+      const excludeTitles = movies.map(movie => movie.movie_name);
+
+      const recommendations = await getMovieRecommendations(
+        { ...preferences, excludeTitles },
+        apiKey
+      );
       setMovies(recommendations);
     } catch (err) {
       // If there's an authentication error, clear the stored API key

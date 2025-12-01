@@ -31,6 +31,11 @@ export interface UserPreferences {
   languages: Language[];
   platforms: Platform[];
   contentTypes: ContentType[];
+  /**
+   * Optional list of titles that should NOT appear in new recommendations.
+   * Matching is done against movie_name (case-insensitive).
+   */
+  excludeTitles?: string[];
 }
 
 export interface MovieCardProps {

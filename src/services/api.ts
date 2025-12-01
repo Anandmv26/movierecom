@@ -2,6 +2,7 @@ import axios, { AxiosError } from 'axios';
 import { UserPreferences, MovieRecommendation } from '../types';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const OPENAI_MODEL = import.meta.env.VITE_OPENAI_MODEL || 'gpt-4o-2024-08-06';
 
 const validateMovieRecommendation = (movie: any): MovieRecommendation => {
   if (!movie || typeof movie !== 'object') {
@@ -83,7 +84,7 @@ export const getMovieRecommendations = async (
     const response = await axios.post(
       OPENAI_API_URL,
       {
-        model: 'gpt-4o-2024-08-06',
+        model: OPENAI_MODEL,
         messages: [
           {
             role: 'system',
@@ -100,6 +101,7 @@ export const getMovieRecommendations = async (
             - Only include content available on the specified platforms (Netflix, Amazon Prime, Hotstar, Sony LIV, Zee5, Others)
             - Match the selected content type (movie, series, or both)
             - Match the selected language (English, Hindi, Tamil, Telugu, Malayalam)
+            - If the user provides an "excludeTitles" array in their preferences, you MUST NOT return any movie or series whose title (movie_name) matches any of those values (case-insensitive)
             - Ensure variety (no duplicates or direct sequels)
             - For series, include number of seasons, episodes, and average episode length in the synopsis
             - The \`trailer_link\` must be a valid **official YouTube trailer URL** in this exact format: https://www.youtube.com/watch?v=VIDEO_ID
@@ -158,11 +160,30 @@ export const getMovieRecommendations = async (
     const cleanedContent = content.replace(/```json\s*|\s*```/g, '').trim();
     const responseData = JSON.parse(cleanedContent);
 
-    if (!responseData.movies || !Array.isArray(responseData.movies) || responseData.movies.length !== 3) {
-      throw new Error('Response must contain a movies array with exactly 3 movies');
+    if (!responseData.movies || !Array.isArray(responseData.movies)) {
+      throw new Error('Response must contain a movies array');
     }
 
-    return responseData.movies.map(validateMovieRecommendation);
+    const validatedMovies: MovieRecommendation[] =
+      responseData.movies.map(validateMovieRecommendation);
+
+    // Apply client-side exclusion as an extra safety net
+    let finalMovies = validatedMovies;
+    if (preferences.excludeTitles && preferences.excludeTitles.length > 0) {
+      const excludeSet = new Set(
+        preferences.excludeTitles.map(title => title.toLowerCase().trim())
+      );
+
+      finalMovies = validatedMovies.filter(movie =>
+        !excludeSet.has(movie.movie_name.toLowerCase().trim())
+      );
+    }
+
+    if (finalMovies.length === 0) {
+      throw new Error('No recommendations available after applying exclusions.');
+    }
+
+    return finalMovies;
   } catch (error) {
     if (error instanceof AxiosError) {
       if (error.response?.status === 401) {
